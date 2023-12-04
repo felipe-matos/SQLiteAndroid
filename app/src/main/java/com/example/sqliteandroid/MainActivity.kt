@@ -15,6 +15,9 @@ class MainActivity : AppCompatActivity() {
     private val bancoDados by lazy {
         DatabaseHelper(this)
     }
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -32,6 +35,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun listar() {
+
+        val sql =  "SELECT * FROM ${DatabaseHelper.TABELA_PRODUTOS};"
+        val cursor = bancoDados.readableDatabase
+            .rawQuery(sql,null)
+
+        val indiceId = cursor.getColumnIndex("${DatabaseHelper.ID_PRODUTO}")
+        val indiceTitulo = cursor.getColumnIndex("${DatabaseHelper.TITULO}")
+        val indiceDescricao = cursor.getColumnIndex("${DatabaseHelper.DESCRICAO}")
+
+       while (cursor.moveToNext()){//false ou true
+
+           val idProduto = cursor.getInt(indiceId)
+           val titulo = cursor.getString(indiceTitulo)
+           val descricao = cursor.getString(indiceDescricao)
+           Log.i("info_db", "id $idProduto - $titulo")
+
+       }
 
     }
 
