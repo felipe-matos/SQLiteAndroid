@@ -30,7 +30,45 @@ class MainActivity : AppCompatActivity() {
             btnListar.setOnClickListener {
                 listar()
             }
+
+            btnAtualizar.setOnClickListener {
+                atualizar()
+            }
+
+            btnRemover.setOnClickListener {
+                remover()
+            }
         }
+
+    }
+
+    private fun remover() {
+
+        val sql = "DELETE FROM ${DatabaseHelper.TABELA_PRODUTOS} WHERE ${DatabaseHelper.ID_PRODUTO} = 1;"
+
+        try {
+            bancoDados.writableDatabase.execSQL(sql)
+            Log.i("info_db", "Sucesso ao remover ")
+        }catch (e:Exception){
+            Log.i("info_db", "Error ao remover : ")
+
+        }
+
+    }
+
+    private fun atualizar() {
+
+        val titulo = binding.editProduto.text.toString()
+        val sql = "UPDATE produtos SET titulo = '$titulo' WHERE id_produto = 1; "
+
+        try {
+            bancoDados.writableDatabase.execSQL(sql)
+            Log.i("info_db", "Sucesso ao atualizar ")
+        }catch (e:Exception){
+            Log.i("info_db", "Error ao atualizar : ")
+
+        }
+
 
     }
 
