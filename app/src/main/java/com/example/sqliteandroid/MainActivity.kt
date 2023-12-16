@@ -3,6 +3,7 @@ package com.example.sqliteandroid
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import com.example.sqliteandroid.database.DatabaseHelper
 import com.example.sqliteandroid.database.ProdutoDAO
 import com.example.sqliteandroid.databinding.ActivityMainBinding
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
         val produtoDAO = ProdutoDAO(this)
 
-        produtoDAO.remover(3)
+        produtoDAO.remover(1)
 
     }
 
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         val produtoDAO = ProdutoDAO(this)
         val produto = Produto(
-            -1, titulo, "descricao.."
+            1, titulo, "descricao.."
         )
         produtoDAO.atualizar(produto)
     }
@@ -69,10 +70,15 @@ class MainActivity : AppCompatActivity() {
         val produto = ProdutoDAO(this)
         val listaProdutos = produto.listar()
 
+        var texto =  ""
         if(listaProdutos.isNotEmpty()){
             listaProdutos.forEach{produto ->
+                texto+= "${produto.idProduto} - ${produto.titulo}\n"
                 Log.i("info_db", "${produto.idProduto} - ${produto.titulo}")
             }
+            binding.textResultado.text = texto
+        } else {
+            binding.textResultado.text = "Nehum item cadastrado"
         }
 
     }
@@ -85,6 +91,12 @@ class MainActivity : AppCompatActivity() {
         val produto = Produto(
             -1, titulo, "descricao.."
         )
-        produtoDAO.salvar(produto)
+        if(produtoDAO.salvar(produto)){
+            Toast.makeText(this, "Sucesso ao cadastrar produto", Toast.LENGTH_SHORT).show()
+            binding.editProduto.setText("")
+        } else {
+            Toast.makeText(this, "Error ao cadastrar produto", Toast.LENGTH_SHORT).show()
+
+        }
     }
 }
