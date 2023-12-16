@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.example.sqliteandroid.database.DatabaseHelper
+import com.example.sqliteandroid.database.ProdutoDAO
 import com.example.sqliteandroid.databinding.ActivityMainBinding
+import com.example.sqliteandroid.model.Produto
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,13 +19,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        with(binding){
-            btnSalvar.setOnClickListener{
+        with(binding) {
+            btnSalvar.setOnClickListener {
                 salvar()
             }
 
@@ -44,66 +45,46 @@ class MainActivity : AppCompatActivity() {
 
     private fun remover() {
 
-        val sql = "DELETE FROM ${DatabaseHelper.TABELA_PRODUTOS} WHERE ${DatabaseHelper.ID_PRODUTO} = 1;"
+        val produtoDAO = ProdutoDAO(this)
 
-        try {
-            bancoDados.writableDatabase.execSQL(sql)
-            Log.i("info_db", "Sucesso ao remover ")
-        }catch (e:Exception){
-            Log.i("info_db", "Error ao remover : ")
-
-        }
+        produtoDAO.remover(3)
 
     }
+
 
     private fun atualizar() {
 
         val titulo = binding.editProduto.text.toString()
-        val sql = "UPDATE produtos SET titulo = '$titulo' WHERE id_produto = 1; "
 
-        try {
-            bancoDados.writableDatabase.execSQL(sql)
-            Log.i("info_db", "Sucesso ao atualizar ")
-        }catch (e:Exception){
-            Log.i("info_db", "Error ao atualizar : ")
-
-        }
-
-
+        val produtoDAO = ProdutoDAO(this)
+        val produto = Produto(
+            -1, titulo, "descricao.."
+        )
+        produtoDAO.atualizar(produto)
     }
+
 
     private fun listar() {
 
-        val sql =  "SELECT * FROM ${DatabaseHelper.TABELA_PRODUTOS};"
-        val cursor = bancoDados.readableDatabase
-            .rawQuery(sql,null)
+        val produto = ProdutoDAO(this)
+        val listaProdutos = produto.listar()
 
-        val indiceId = cursor.getColumnIndex("${DatabaseHelper.ID_PRODUTO}")
-        val indiceTitulo = cursor.getColumnIndex("${DatabaseHelper.TITULO}")
-        val indiceDescricao = cursor.getColumnIndex("${DatabaseHelper.DESCRICAO}")
-
-       while (cursor.moveToNext()){//false ou true
-
-           val idProduto = cursor.getInt(indiceId)
-           val titulo = cursor.getString(indiceTitulo)
-           val descricao = cursor.getString(indiceDescricao)
-           Log.i("info_db", "id $idProduto - $titulo")
-
-       }
+        if(listaProdutos.isNotEmpty()){
+            listaProdutos.forEach{produto ->
+                Log.i("info_db", "${produto.idProduto} - ${produto.titulo}")
+            }
+        }
 
     }
 
-   private fun salvar(){
+    private fun salvar() {
 
-       val titulo = binding.editProduto.text.toString()
-       val sql = "INSERT into produtos VALUES (null,'$titulo', 'Descricao..');"
+        val titulo = binding.editProduto.text.toString()
 
-        try {
-            bancoDados.writableDatabase.execSQL(sql)
-            Log.i("info_db", "Sucesso ao inserir ")
-        }catch (e:Exception){
-            Log.i("info_db", "Error ao inserir : ")
-
-        }
+        val produtoDAO = ProdutoDAO(this)
+        val produto = Produto(
+            -1, titulo, "descricao.."
+        )
+        produtoDAO.salvar(produto)
     }
 }
